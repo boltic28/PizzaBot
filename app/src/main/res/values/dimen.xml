@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="map_size">350dp</dimen>
+    <dimen name="map_size_margin_bottom">8dp</dimen>
+    <dimen name="map_path_width">8dp</dimen>
+    <dimen name="map_grill_width">1dp</dimen>
+    <dimen name="map_order_radius">11dp</dimen>
+
+    <dimen name="main_screen_padding">24dp</dimen>
+</resources>
