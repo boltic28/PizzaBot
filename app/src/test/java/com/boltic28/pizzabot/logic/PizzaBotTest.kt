@@ -6,6 +6,7 @@ import com.boltic28.pizzabot.data.MapView
 import com.boltic28.pizzabot.data.dto.NeighborHood
 import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
+import com.boltic28.pizzabot.domain.PizzaBot
 import junit.framework.TestCase
 import org.junit.Before
 import org.junit.Test
@@ -32,47 +33,47 @@ class PizzaBotTest : TestCase() {
     @Test
     fun validate() {
         println(map.initGrill(neighborHood))
-        println(map.dropPizza(order))
-        println(map.makeStep(position))
+        println(map.loadOrders(order))
+        println(map.loadPath(position))
     }
 
     @Test
     fun validate1() {
-        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)(7,5)(9,10)", map).init())
+        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)(7,5)(9,10)", map).checkData())
     }
 
     @Test
     fun validate2() {
-        assertEquals(WORK_IS_DONE, PizzaBot("24x11   (4,7)  (7,  5)( 9,10)", map).init())
+        assertEquals(WORK_IS_DONE, PizzaBot("24x11   (4,7)  (7,  5)( 9,10)", map).checkData())
     }
 
     @Test
     fun validate3() {
-        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)  (  7 , 5 ) ( 9 , 10)   ", map).init())
+        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)  (  7 , 5 ) ( 9 , 10)   ", map).checkData())
     }
 
     @Test
     fun validate4() {
-        assertEquals(WORK_IS_DONE, PizzaBot("13 x19 ( 4 , 7 ) (7,5)(9,10)", map).init())
+        assertEquals(WORK_IS_DONE, PizzaBot("13 x19 ( 4 , 7 ) (7,5)(9,10)", map).checkData())
     }
 
     @Test
     fun validate5() {
-        assertEquals(WORK_IS_DONE, PizzaBot("10x 10(4,7) (7 ,5) (9,10)", map).init())
+        assertEquals(WORK_IS_DONE, PizzaBot("10x 10(4,7) (7 ,5) (9,10)", map).checkData())
     }
 
     @Test
     fun notValidate1() {
-        assertEquals(WORK_IS_FAILED, PizzaBot("10X 10(4,7) (7 ,5) (9,10)", map).init())
+        assertEquals(WORK_IS_FAILED, PizzaBot("10X 10(4,7) (7 ,5) (9,10)", map).checkData())
     }
 
     @Test
     fun notValidate2() {
-        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(4.7) (7 ,5) (9,10)", map).init())
+        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(4.7) (7 ,5) (9,10)", map).checkData())
     }
 
     @Test
     fun notValidate3() {
-        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(47) (7 ,5) (9,10)", map).init())
+        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(47) (7 ,5) (9,10)", map).checkData())
     }
 }

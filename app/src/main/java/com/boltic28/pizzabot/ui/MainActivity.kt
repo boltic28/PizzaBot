@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.boltic28.pizzabot.Constants
 import com.boltic28.pizzabot.Constants.WORK_IS_FAILED
 import com.boltic28.pizzabot.R
 import com.boltic28.pizzabot.databinding.ActivityMainBinding
@@ -26,22 +27,42 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        binding.startDelivery.setOnClickListener {
-            startDelivery()
+        with(binding){
+            loggerView.movementMethod = ScrollingMovementMethod()
+            startDelivery.setOnClickListener { startDelivery() }
         }
+
+        if (viewModel.isBotStarted){ observeData() }
     }
 
     private fun startDelivery() {
         val data = binding.inputField.text.toString()
+
+        if (viewModel.createDeliveryBot(data) == Constants.READY_TO_DELIVERY) {
+            observeData()
+        } else {
+            writeLog(WORK_IS_FAILED)
+            showAttention()
+        }
+    }
+
+    private fun observeData(){
         val map = binding.deliveryView
+        with(viewModel.pizzaBot) {
+            init.onEach {
+                map.initGrill(it) }.launchWhenStarted(lifecycleScope)
+            finishedOrders.onEach {
+                map.loadOrders(it) }.launchWhenStarted(lifecycleScope)
+            path.onEach {
+                map.loadPath(it) }.launchWhenStarted(lifecycleScope)
+            logger.onEach {
+                writeLog(it) }.launchWhenStarted(lifecycleScope)
+        }
+    }
 
-        viewModel.startDelivery(data, map).logger.onEach {
-            if (it == WORK_IS_FAILED) showAttention()
-            val log = "${binding.loggerView.text} \n $it"
-            binding.loggerView.text = log
-        }.launchWhenStarted(lifecycleScope)
-
-        binding.loggerView.movementMethod = ScrollingMovementMethod()
+    private fun writeLog(msg: String) {
+        val log = "${binding.loggerView.text} \n $msg"
+        binding.loggerView.text = log
     }
 
     private fun showAttention() {

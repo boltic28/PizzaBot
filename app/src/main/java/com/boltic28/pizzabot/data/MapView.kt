@@ -93,15 +93,17 @@ class MapView : View {
         invalidate()
     }
 
-    fun makeStep(position: Position) {
+    fun loadPath(newPath: List<Position>) {
         currentPosition = Position()
-        path.add(position)
+        path.clear()
+        path.addAll(newPath)
         invalidate()
     }
 
-    fun dropPizza(order: Order) {
+    fun loadOrders(orders: List<Order>) {
         currentPosition = Position()
-        finishedOrders.add(order)
+        finishedOrders.clear()
+        finishedOrders.addAll(orders)
         invalidate()
     }
 

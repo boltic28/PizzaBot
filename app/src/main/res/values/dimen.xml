@@ -6,5 +6,5 @@
     <dimen name="map_grill_width">1dp</dimen>
     <dimen name="map_order_radius">11dp</dimen>
 
-    <dimen name="main_screen_padding">24dp</dimen>
+    <dimen name="main_screen_padding">12dp</dimen>
 </resources>

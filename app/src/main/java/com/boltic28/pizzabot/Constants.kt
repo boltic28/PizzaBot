@@ -13,6 +13,7 @@ object Constants {
     //deliverMan
     const val ONE_STEP_TIME = 400L
     const val WORK_IS_DONE = "ENNNDEEEND"
+    const val READY_TO_DELIVERY = "ready to delivery"
     const val WORK_IS_FAILED = "!!! Wrong data !!!  Use a template"
 
     //map

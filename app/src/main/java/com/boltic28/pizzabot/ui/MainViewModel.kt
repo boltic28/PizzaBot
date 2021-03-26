@@ -1,12 +1,17 @@
 package com.boltic28.pizzabot.ui
 
 import androidx.lifecycle.ViewModel
-import com.boltic28.pizzabot.data.MapView
-import com.boltic28.pizzabot.logic.PizzaBot
+import com.boltic28.pizzabot.domain.PizzaBot
 
 class MainViewModel: ViewModel() {
 
-    fun startDelivery(data: String, map: MapView): PizzaBot {
-        return PizzaBot(data, map).apply { init()}
+    lateinit var pizzaBot: PizzaBot
+    var isBotStarted = false
+
+
+    fun createDeliveryBot(data: String): String {
+        isBotStarted = true
+        pizzaBot = PizzaBot(data)
+        return pizzaBot.checkData()
     }
 }

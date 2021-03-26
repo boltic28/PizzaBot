@@ -1,4 +1,4 @@
-package com.boltic28.pizzabot.logic
+package com.boltic28.pizzabot.domain
 
 import com.boltic28.pizzabot.Constants.EMPTY_TEXT
 import com.boltic28.pizzabot.Constants.NEIGHBORHOOD_COORDINATES_SEPARATOR
@@ -6,10 +6,9 @@ import com.boltic28.pizzabot.Constants.ONE_STEP_TIME
 import com.boltic28.pizzabot.Constants.ORDER_COORDINATES_SEPARATOR
 import com.boltic28.pizzabot.Constants.ORDER_PREFIX
 import com.boltic28.pizzabot.Constants.ORDER_SUFFIX
+import com.boltic28.pizzabot.Constants.READY_TO_DELIVERY
 import com.boltic28.pizzabot.Constants.WORK_IS_DONE
 import com.boltic28.pizzabot.Constants.WORK_IS_FAILED
-import com.boltic28.pizzabot.data.MapView
-import com.boltic28.pizzabot.data.Movable
 import com.boltic28.pizzabot.data.dto.NeighborHood
 import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
@@ -21,7 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PizzaBot(private val data: String, private val map: MapView) : Movable {
+class PizzaBot(private val data: String) {
 
     private lateinit var neighborHood: NeighborHood
     private lateinit var orders: List<Order>
@@ -31,15 +30,24 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
     private val _logger = MutableStateFlow(EMPTY_TEXT)
     val logger: StateFlow<String> = _logger.asStateFlow()
 
-    fun init(): String {
+    private val _init = MutableStateFlow(NeighborHood())
+    val init: StateFlow<NeighborHood> = _init.asStateFlow()
+
+    private val pathStorage = mutableListOf<Position>()
+    private val _path = MutableStateFlow(listOf(Position()))
+    val path: StateFlow<List<Position>> = _path.asStateFlow()
+
+    private val finishedOrdersStorage = mutableListOf<Order>()
+    private val _finishedOrders = MutableStateFlow(listOf<Order>())
+    val finishedOrders: StateFlow<List<Order>> = _finishedOrders.asStateFlow()
+
+    fun checkData(): String =
         if (initData()) {
             startDelivery()
+            READY_TO_DELIVERY
         } else {
-            logEvent(WORK_IS_FAILED)
-            return WORK_IS_FAILED
+            WORK_IS_FAILED
         }
-        return WORK_IS_DONE
-    }
 
     private fun initData(): Boolean {
         try {
@@ -56,7 +64,7 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
             logEvent("${result.size} pizza(s) in a bag")
             logEvent("neighborhood size is: ${neighborHood.width}:${neighborHood.height}")
             orders = result
-            map.initGrill(neighborHood)
+            _init.value = neighborHood
             return true
         } catch (e: Exception) {
             logEvent("order list is not configured: $e")
@@ -141,7 +149,7 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
         }
     }
 
-    override fun moveNorth() {
+    private fun moveNorth() {
         val newY = deliverManPosition.y + 1
         if (newY <= neighborHood.height) {
             updateDeliverManPosition(null, newY)
@@ -151,7 +159,7 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
         }
     }
 
-    override fun moveSouth() {
+    private fun moveSouth() {
         val newY = deliverManPosition.y - 1
         if (newY > 0) {
             updateDeliverManPosition(null, newY)
@@ -161,7 +169,7 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
         }
     }
 
-    override fun moveWest() {
+    private fun moveWest() {
         val newX = deliverManPosition.x - 1
         if (newX > 0) {
             updateDeliverManPosition(newX, null)
@@ -171,7 +179,7 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
         }
     }
 
-    override fun moveEast() {
+    private fun moveEast() {
         val newX = deliverManPosition.x + 1
         if (newX <= neighborHood.width) {
             updateDeliverManPosition(newX, null)
@@ -181,14 +189,15 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
         }
     }
 
-    override fun dropPizza() {
+    private fun dropPizza() {
         try {
             orders.filter { order ->
                 order.position == deliverManPosition && !order.isFinished()
             }.forEach {
                 it.finish()
                 logEvent("pizza ${orders.indexOf(it) + 1} dropped")
-                map.dropPizza(it)
+                finishedOrdersStorage.add(it)
+                _finishedOrders.value = listOf(*finishedOrdersStorage.toTypedArray())
             }
         } catch (e: Exception) {
             logEvent("bad coordinates for deliver")
@@ -198,7 +207,8 @@ class PizzaBot(private val data: String, private val map: MapView) : Movable {
     private fun updateDeliverManPosition(x: Int?, y: Int?) {
         x?.let { deliverManPosition = deliverManPosition.copy(x = x) }
         y?.let { deliverManPosition = deliverManPosition.copy(y = y) }
-        map.makeStep(deliverManPosition)
+        pathStorage.add(deliverManPosition)
+        _path.value = listOf(*pathStorage.toTypedArray())
     }
 
     private fun logEvent(msg: String) {
