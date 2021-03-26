@@ -33,47 +33,47 @@ class PizzaBotTest : TestCase() {
     @Test
     fun validate() {
         println(map.initGrill(neighborHood))
-        println(map.loadOrders(order))
-        println(map.loadPath(position))
+        println(map.loadOrders(listOf(order)))
+        println(map.loadPath(listOf(position)))
     }
 
     @Test
     fun validate1() {
-        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)(7,5)(9,10)", map).checkData())
+        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)(7,5)(9,10)").isReady())
     }
 
     @Test
     fun validate2() {
-        assertEquals(WORK_IS_DONE, PizzaBot("24x11   (4,7)  (7,  5)( 9,10)", map).checkData())
+        assertEquals(WORK_IS_DONE, PizzaBot("24x11   (4,7)  (7,  5)( 9,10)").isReady())
     }
 
     @Test
     fun validate3() {
-        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)  (  7 , 5 ) ( 9 , 10)   ", map).checkData())
+        assertEquals(WORK_IS_DONE, PizzaBot("10x10(4,7)  (  7 , 5 ) ( 9 , 10)   ").isReady())
     }
 
     @Test
     fun validate4() {
-        assertEquals(WORK_IS_DONE, PizzaBot("13 x19 ( 4 , 7 ) (7,5)(9,10)", map).checkData())
+        assertEquals(WORK_IS_DONE, PizzaBot("13 x19 ( 4 , 7 ) (7,5)(9,10)").isReady())
     }
 
     @Test
     fun validate5() {
-        assertEquals(WORK_IS_DONE, PizzaBot("10x 10(4,7) (7 ,5) (9,10)", map).checkData())
+        assertEquals(WORK_IS_DONE, PizzaBot("10x 10(4,7) (7 ,5) (9,10)").isReady())
     }
 
     @Test
     fun notValidate1() {
-        assertEquals(WORK_IS_FAILED, PizzaBot("10X 10(4,7) (7 ,5) (9,10)", map).checkData())
+        assertEquals(WORK_IS_FAILED, PizzaBot("10X 10(4,7) (7 ,5) (9,10)").isReady())
     }
 
     @Test
     fun notValidate2() {
-        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(4.7) (7 ,5) (9,10)", map).checkData())
+        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(4.7) (7 ,5) (9,10)").isReady())
     }
 
     @Test
     fun notValidate3() {
-        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(47) (7 ,5) (9,10)", map).checkData())
+        assertEquals(WORK_IS_FAILED, PizzaBot("10x 10(47) (7 ,5) (9,10)").isReady())
     }
 }

@@ -6,13 +6,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.boltic28.pizzabot.Constants
 import com.boltic28.pizzabot.Constants.WORK_IS_FAILED
 import com.boltic28.pizzabot.R
 import com.boltic28.pizzabot.databinding.ActivityMainBinding
 import com.boltic28.pizzabot.launchWhenStarted
 import kotlinx.coroutines.flow.onEach
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,7 +36,8 @@ class MainActivity : AppCompatActivity() {
     private fun startDelivery() {
         val data = binding.inputField.text.toString()
 
-        if (viewModel.createDeliveryBot(data) == Constants.READY_TO_DELIVERY) {
+        if (isDataRight(data)) {
+            deliverPizza()
             observeData()
         } else {
             writeLog(WORK_IS_FAILED)
@@ -46,8 +45,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun isDataRight(data: String) = viewModel.createBot(data)
+
+    private fun deliverPizza() = viewModel.pizzaBot.startDelivery()
+
     private fun observeData(){
         val map = binding.deliveryView
+
         with(viewModel.pizzaBot) {
             init.onEach {
                 map.initGrill(it) }.launchWhenStarted(lifecycleScope)
@@ -68,5 +72,4 @@ class MainActivity : AppCompatActivity() {
     private fun showAttention() {
         Toast.makeText(this, resources.getString(R.string.wrong_input), Toast.LENGTH_LONG).show()
     }
-
 }

@@ -6,9 +6,7 @@ import com.boltic28.pizzabot.Constants.ONE_STEP_TIME
 import com.boltic28.pizzabot.Constants.ORDER_COORDINATES_SEPARATOR
 import com.boltic28.pizzabot.Constants.ORDER_PREFIX
 import com.boltic28.pizzabot.Constants.ORDER_SUFFIX
-import com.boltic28.pizzabot.Constants.READY_TO_DELIVERY
 import com.boltic28.pizzabot.Constants.WORK_IS_DONE
-import com.boltic28.pizzabot.Constants.WORK_IS_FAILED
 import com.boltic28.pizzabot.data.dto.NeighborHood
 import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
@@ -41,15 +39,7 @@ class PizzaBot(private val data: String) {
     private val _finishedOrders = MutableStateFlow(listOf<Order>())
     val finishedOrders: StateFlow<List<Order>> = _finishedOrders.asStateFlow()
 
-    fun checkData(): String =
-        if (initData()) {
-            startDelivery()
-            READY_TO_DELIVERY
-        } else {
-            WORK_IS_FAILED
-        }
-
-    private fun initData(): Boolean {
+    fun isReady(): Boolean {
         try {
             val result = mutableListOf<Order>()
             data.split(ORDER_PREFIX).toMutableList().apply {
@@ -69,6 +59,19 @@ class PizzaBot(private val data: String) {
         } catch (e: Exception) {
             logEvent("order list is not configured: $e")
             return false
+        }
+    }
+
+    fun startDelivery() {
+        CoroutineScope(Dispatchers.Default).launch {
+            while (orders.any { !it.isFinished() }) {
+                val nextOrder = findNearestOrder()
+                while (nextOrder.position != deliverManPosition) {
+                    makeStepTo(nextOrder)
+                }
+                dropPizza()
+            }
+            logEvent(WORK_IS_DONE)
         }
     }
 
@@ -105,19 +108,6 @@ class PizzaBot(private val data: String) {
         } catch (e: NumberFormatException) {
             logEvent("bad order position: $e")
             return null
-        }
-    }
-
-    private fun startDelivery() {
-        CoroutineScope(Dispatchers.Default).launch {
-            while (orders.any { !it.isFinished() }) {
-                val nextOrder = findNearestOrder()
-                while (nextOrder.position != deliverManPosition) {
-                    makeStepTo(nextOrder)
-                }
-                dropPizza()
-            }
-            logEvent(WORK_IS_DONE)
         }
     }
 
