@@ -1,7 +1,6 @@
 # PizzaBot
 
 1. <b>Install PizzaBotSlice.apk on your Android phone.</b>
-  - download it by link https://drive.google.com/file/d/1UWUFhSj1e0U5KsPp221SyX8up7-cuvvN/view?usp=sharing
 	- you can input different command into special field (above “start delivery” button)
 	- you will see logos about deliveryman’s movement and order’s completing ( below map)
 	- you can scroll logos and make review of it
@@ -11,9 +10,10 @@
 2. <b>Go to the GitHub</b> by     https://github.com/boltic28/PizzaBot/tree/master.      And have a look at the code 
 3. <b>Stack</b>
 	- MVVM architecture
+	- Strategy pattern
 	- Kotlin     
 	- Multithreading by Kotlin Coroutines and StateFlow
 	- CustomView for drawing deliveryman’s path
 	- Mockito
 4. <b>Testing</b>
-	- testes are provided for PizzaBot.kt only. It has just one open method   init(): String
+	- testes cover more than 80% of the code.
