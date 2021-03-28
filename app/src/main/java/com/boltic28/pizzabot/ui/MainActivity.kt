@@ -10,7 +10,11 @@ import com.boltic28.pizzabot.Constants.WORK_IS_FAILED
 import com.boltic28.pizzabot.R
 import com.boltic28.pizzabot.databinding.ActivityMainBinding
 import com.boltic28.pizzabot.launchWhenStarted
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,48 +29,82 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        with(binding){
+        with(binding) {
             loggerView.movementMethod = ScrollingMovementMethod()
-            startDelivery.setOnClickListener { startDelivery() }
+            byCar.setOnClickListener {
+                deliverByCar(true)
+                startDelivery()
+            }
+            byFeet.setOnClickListener {
+                deliverByCar(false)
+                startDelivery()
+            }
         }
 
-        if (viewModel.isBotStarted){ observeData() }
+        if (viewModel.isBotStarted) {
+            initMap()
+            observeDeliveryProcess()
+        }
+    }
+
+    private fun deliverByCar(isCar: Boolean) {
+        viewModel.isCarDelivery = isCar
     }
 
     private fun startDelivery() {
+        clearMap()
         val data = binding.inputField.text.toString()
+        val neighborHood = parseNeighborhood(data)
 
-        if (isDataRight(data)) {
+        if (neighborHood != null) {
+            binding.deliveryView.initGrill(neighborHood)
             deliverPizza()
-            observeData()
+            observeDeliveryProcess()
         } else {
-            writeLog(WORK_IS_FAILED)
+            showLogs(listOf(WORK_IS_FAILED))
             showAttention()
         }
     }
 
-    private fun isDataRight(data: String) = viewModel.createBot(data)
+    private fun clearMap(){
+        binding.deliveryView.clearMap()
+    }
 
-    private fun deliverPizza() = viewModel.pizzaBot.startDelivery()
-
-    private fun observeData(){
-        val map = binding.deliveryView
-
-        with(viewModel.pizzaBot) {
-            init.onEach {
-                map.initGrill(it) }.launchWhenStarted(lifecycleScope)
-            finishedOrders.onEach {
-                map.loadOrders(it) }.launchWhenStarted(lifecycleScope)
-            path.onEach {
-                map.loadPath(it) }.launchWhenStarted(lifecycleScope)
-            logger.onEach {
-                writeLog(it) }.launchWhenStarted(lifecycleScope)
+    private fun initMap(){
+        with(binding.deliveryView){
+            initGrill(viewModel.parser.getDistrictModel())
+            invalidate()
         }
     }
 
-    private fun writeLog(msg: String) {
-        val log = "${binding.loggerView.text} \n $msg"
-        binding.loggerView.text = log
+    private fun parseNeighborhood(data: String) = viewModel.createBot(data)
+
+    private fun deliverPizza() =
+        CoroutineScope(Dispatchers.Default).launch {
+            viewModel.pizzaBot.startDelivery()
+        }
+
+    private fun observeDeliveryProcess() {
+        val map = binding.deliveryView
+        with(viewModel.pizzaBot) {
+            observeOrders().onEach {
+                map.loadOrders(it)
+            }.launchWhenStarted(lifecycleScope)
+            observePath().onEach {
+                map.loadPath(it)
+            }.launchWhenStarted(lifecycleScope)
+            observeLogs().onEach {
+                showLogs(it)
+            }.launchWhenStarted(lifecycleScope)
+        }
+    }
+
+    private fun showLogs(logs: List<String>) {
+        val log = StringBuilder(resources.getString(R.string.logging))
+        logs.forEach {
+            log.append("\n $it")
+        }
+        binding.loggerView.text = log.toString()
     }
 
     private fun showAttention() {

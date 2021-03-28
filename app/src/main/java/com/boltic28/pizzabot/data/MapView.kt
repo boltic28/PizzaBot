@@ -31,7 +31,8 @@ class MapView : View {
     private var stepX = 0f
     private var stepY = 0f
     private var neighborHood: NeighborHood? = null
-    private var currentPosition = Position()
+    private var currentPosition =
+        Position()
 
 
     override fun onDraw(canvas: Canvas?) {
@@ -87,10 +88,7 @@ class MapView : View {
 
     fun initGrill(neighborHood: NeighborHood) {
         this.neighborHood = neighborHood
-        currentPosition = Position()
-        finishedOrders.clear()
-        path.clear()
-        invalidate()
+        clearMap()
     }
 
     fun loadPath(newPath: List<Position>) {
@@ -104,6 +102,13 @@ class MapView : View {
         currentPosition = Position()
         finishedOrders.clear()
         finishedOrders.addAll(orders)
+        invalidate()
+    }
+
+    fun clearMap(){
+        currentPosition = Position()
+        finishedOrders.clear()
+        path.clear()
         invalidate()
     }
 
