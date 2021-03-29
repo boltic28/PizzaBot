@@ -1,8 +1,10 @@
 package com.boltic28.pizzabot.domain.logging
 
-interface Logger {
+import kotlinx.coroutines.flow.StateFlow
 
-    fun log(msg: String): Boolean
+interface Logger {
+    fun observeLogs(): StateFlow<List<String>>
     fun getLogs(): List<String>
+    fun log(msg: String)
     fun clear()
 }

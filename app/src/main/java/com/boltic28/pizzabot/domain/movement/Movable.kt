@@ -1,11 +1,14 @@
 package com.boltic28.pizzabot.domain.movement
 
 import com.boltic28.pizzabot.data.dto.Position
+import kotlinx.coroutines.flow.StateFlow
 
 interface Movable {
 
-    fun getPosition(): Position
+    fun observePath(): StateFlow<List<Position>>
+
     fun getPath(): List<Position>
+    fun getPosition(): Position
     fun clear()
 
     suspend fun cancelStep(): List<Position>

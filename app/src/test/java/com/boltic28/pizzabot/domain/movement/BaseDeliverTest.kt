@@ -11,15 +11,15 @@ import org.junit.Test
 
 class BaseDeliverTest : TestCase() {
 
-    lateinit var position: Position
-    lateinit var mover: Movable
-    lateinit var dispatcher: CoroutineDispatcher
+    private lateinit var position: Position
+    private lateinit var mover: Movable
+    private lateinit var dispatcher: CoroutineDispatcher
 
     @Before
     public override fun setUp() {
         dispatcher = Dispatchers.Unconfined
         position = Position(4,4)
-        mover = MoveByCar(position)
+        mover = DeliverByCar(position)
     }
 
     @Test

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import org.junit.Before
 import org.junit.Test
 
-class MoveByFeetTest : TestCase() {
+class DeliverByCarTest : TestCase() {
 
     lateinit var position: Position
     lateinit var mover: Movable
@@ -19,7 +19,7 @@ class MoveByFeetTest : TestCase() {
     override fun setUp() {
         dispatcher = Dispatchers.Unconfined
         position = Position(4,4)
-        mover = MoveByFeet(position)
+        mover = DeliverByCar(position)
     }
 
     @Test

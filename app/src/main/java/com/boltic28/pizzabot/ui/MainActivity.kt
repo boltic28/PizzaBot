@@ -14,7 +14,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 

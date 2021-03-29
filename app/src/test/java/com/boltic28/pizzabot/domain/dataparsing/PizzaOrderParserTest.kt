@@ -1,8 +1,8 @@
 package com.boltic28.pizzabot.domain.dataparsing
 
 import com.boltic28.pizzabot.data.dto.NeighborHood
-import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
+import com.boltic28.pizzabot.domain.ordering.Order
 import junit.framework.TestCase
 import org.junit.Before
 import org.junit.Test
@@ -33,8 +33,8 @@ class PizzaOrderParserTest : TestCase() {
     fun testGetOrders() {
         pizzaOrderParser.isDataCorrect(rightData1)
         assertEquals(4, pizzaOrderParser.getOrders().size)
-        assertEquals(Position(1,2).x, pizzaOrderParser.getOrders().first().position.x)
-        assertEquals(Position(6,6).y, pizzaOrderParser.getOrders().last().position.y)
+        assertEquals(Position(1,2).x, pizzaOrderParser.getOrders().first().getPosition().x)
+        assertEquals(Position(6,6).y, pizzaOrderParser.getOrders().last().getPosition().y)
     }
 
     @Test

@@ -1,31 +1,23 @@
 package com.boltic28.pizzabot.domain.delivery
 
-import com.boltic28.pizzabot.Constants
-import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
 import com.boltic28.pizzabot.domain.logging.Logger
 import com.boltic28.pizzabot.domain.movement.Movable
-import com.boltic28.pizzabot.domain.ordering.OrderKeeper
+import com.boltic28.pizzabot.domain.ordering.Order
+import com.boltic28.pizzabot.domain.ordering.OrdersKeeper
 import com.boltic28.pizzabot.domain.routing.Route
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 abstract class DeliveryImpl: Delivery {
 
     abstract var deliver: Movable
     abstract var logger: Logger
     abstract var router: Route<Order>
-    abstract var orderKeeper: OrderKeeper<Order>
+    abstract var ordersKeeper: OrdersKeeper<Order>
 
-    private val _path = MutableStateFlow(listOf(Position()))
-    override fun observePath(): StateFlow<List<Position>> = _path.asStateFlow()
-
-    private val _logger = MutableStateFlow(listOf<String>())
-    override fun observeLogs(): StateFlow<List<String>> = _logger.asStateFlow()
-
-    private val _finishedOrders = MutableStateFlow(listOf<Order>())
-    override fun observeOrders(): StateFlow<List<Order>> = _finishedOrders.asStateFlow()
+    override fun observePath(): StateFlow<List<Position>> = deliver.observePath()
+    override fun observeLogs(): StateFlow<List<String>> = logger.observeLogs()
+    override fun observeOrders(): StateFlow<List<Order>> = ordersKeeper.observeFinishedOrders()
 
     fun changeDeliveryTypeTo(deliver: Movable) {
         this.deliver = deliver
@@ -39,14 +31,14 @@ abstract class DeliveryImpl: Delivery {
         this.router = router
     }
 
-    fun changeOrderKeeper(keeper: OrderKeeper<Order>){
-        this.orderKeeper = keeper
+    fun changeOrderKeeper(keeper: OrdersKeeper<Order>){
+        this.ordersKeeper = keeper
     }
 
     protected fun getNextOrder(): Order = router.getNearestTo(deliver.getPosition())
 
     protected suspend fun makeStepTo(order: Order) {
-        val ord = order.position
+        val ord = order.getPosition()
         val pos = deliver.getPosition()
         when(true){
             pos.x == ord.x && pos.y < ord.y -> {
@@ -81,23 +73,20 @@ abstract class DeliveryImpl: Delivery {
                 deliver.moveSW()
                 log("moveSouthWest -> ${deliver.getPosition().x}:${deliver.getPosition().y}")
             }
-            else -> finishOrdersOnPosition(order.position)
+            else -> finishOrdersOnPosition(order.getPosition())
         }
-        _path.value = listOf(*deliver.getPath().toTypedArray())
     }
 
     protected fun finishOrdersOnPosition(position: Position){
-        orderKeeper.getOrders()
-            .filter { it.position == position }
+        ordersKeeper.getOrders()
+            .filter { it.getPosition() == position }
             .forEach {
-                log("pizza ${orderKeeper.getOrders().indexOf(it) + 1} dropped")
-                orderKeeper.closeOrder(it)
+                log("pizza ${ordersKeeper.getOrders().indexOf(it) + 1} dropped")
+                ordersKeeper.closeOrder(it)
             }
-        _finishedOrders.value = listOf(*orderKeeper.getFinished().toTypedArray())
     }
 
     protected fun log(msg: String){
         logger.log(msg)
-        _logger.value = listOf(*logger.getLogs().toTypedArray())
     }
 }

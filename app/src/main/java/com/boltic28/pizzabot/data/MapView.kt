@@ -10,8 +10,8 @@ import com.boltic28.pizzabot.Constants
 import com.boltic28.pizzabot.Constants.ORDER_SCALE_TO_SECTOR
 import com.boltic28.pizzabot.R
 import com.boltic28.pizzabot.data.dto.NeighborHood
-import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
+import com.boltic28.pizzabot.domain.ordering.Order
 
 class MapView : View {
 
@@ -71,15 +71,15 @@ class MapView : View {
             finishedOrders.forEach {
                 paint.order()
                 canvas?.drawCircle(
-                    it.position.x * stepX,
-                    mapSize - it.position.y * stepY,
+                    it.getPosition().x * stepX,
+                    mapSize - it.getPosition().y * stepY,
                     stepX * ORDER_SCALE_TO_SECTOR,
                     paint
                 )
                 paint.text()
-                canvas?.drawText(it.number.toString(),
-                    it.position.x * stepX,
-                    mapSize - it.position.y * stepY + stepX * Constants.TEXT_SCALE_TO_SECTOR / 2,
+                canvas?.drawText(it.getId().toString(),
+                    it.getPosition().x * stepX,
+                    mapSize - it.getPosition().y * stepY + stepX * Constants.TEXT_SCALE_TO_SECTOR / 2,
                     paint
                 )
             }

@@ -2,7 +2,7 @@ package com.boltic28.pizzabot.domain.movement
 
 import com.boltic28.pizzabot.data.dto.Position
 
-class MoveByCar(position: Position) : BaseDeliver(position) {
+class DeliverByCar(position: Position) : BaseDeliver(position) {
 
     override suspend fun moveSW(): List<Position> {
         moveSouth()

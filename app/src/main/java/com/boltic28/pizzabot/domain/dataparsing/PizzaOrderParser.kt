@@ -2,8 +2,9 @@ package com.boltic28.pizzabot.domain.dataparsing
 
 import com.boltic28.pizzabot.Constants
 import com.boltic28.pizzabot.data.dto.NeighborHood
-import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
+import com.boltic28.pizzabot.domain.ordering.Order
+import com.boltic28.pizzabot.domain.ordering.PizzaOrder
 
 class PizzaOrderParser: OrderParser<Order, NeighborHood> {
 
@@ -55,7 +56,7 @@ class PizzaOrderParser: OrderParser<Order, NeighborHood> {
                     .map { it.trim().toInt() }
             ) {
                 if (this.size < 2) return null
-                return Order(
+                return PizzaOrder(
                     Position(
                         first(),
                         last()

@@ -1,7 +1,7 @@
 package com.boltic28.pizzabot.domain.delivery
 
-import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
+import com.boltic28.pizzabot.domain.ordering.Order
 import kotlinx.coroutines.flow.StateFlow
 
 interface Delivery {

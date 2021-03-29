@@ -2,16 +2,16 @@ package com.boltic28.pizzabot.domain.delivery
 
 import com.boltic28.pizzabot.Constants.WORK_IS_DONE
 import com.boltic28.pizzabot.data.dto.NeighborHood
-import com.boltic28.pizzabot.data.dto.Order
 import com.boltic28.pizzabot.data.dto.Position
 import com.boltic28.pizzabot.domain.dataparsing.OrderParser
 import com.boltic28.pizzabot.domain.dataparsing.PizzaOrderParser
-import com.boltic28.pizzabot.domain.logging.DeliveryLogger
 import com.boltic28.pizzabot.domain.logging.Logger
-import com.boltic28.pizzabot.domain.movement.MoveByCar
-import com.boltic28.pizzabot.domain.ordering.OrderKeeper
+import com.boltic28.pizzabot.domain.logging.PizzaLogger
+import com.boltic28.pizzabot.domain.movement.DeliverByCar
+import com.boltic28.pizzabot.domain.ordering.Order
+import com.boltic28.pizzabot.domain.ordering.OrdersKeeper
 import com.boltic28.pizzabot.domain.ordering.PizzaOrdersKeeper
-import com.boltic28.pizzabot.domain.routing.PizzaBotRouter
+import com.boltic28.pizzabot.domain.routing.PizzaRouter
 import junit.framework.TestCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +29,7 @@ class DeliveryImplTest : TestCase() {
     lateinit var parser: OrderParser<Order, NeighborHood>
     lateinit var delivery: Delivery
     lateinit var logger: Logger
-    lateinit var orderKeeper: OrderKeeper<Order>
+    lateinit var ordersKeeper: OrdersKeeper<Order>
     lateinit var dispatcher: CoroutineDispatcher
 
     @Before
@@ -37,13 +37,13 @@ class DeliveryImplTest : TestCase() {
         dispatcher = Dispatchers.Unconfined
 
         parser = PizzaOrderParser().apply { isDataCorrect(startData) }
-        orderKeeper = PizzaOrdersKeeper(parser.getOrders())
-        logger = DeliveryLogger()
-        delivery = BotSlice(
-            MoveByCar(Position()),
+        ordersKeeper = PizzaOrdersKeeper(parser.getOrders())
+        logger = PizzaLogger()
+        delivery = PizzaSliceBot(
+            DeliverByCar(Position()),
             logger,
-            PizzaBotRouter(orderKeeper),
-            orderKeeper)
+            PizzaRouter(ordersKeeper),
+            ordersKeeper)
     }
 
     @Test

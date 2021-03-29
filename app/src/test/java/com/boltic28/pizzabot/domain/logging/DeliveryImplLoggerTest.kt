@@ -15,7 +15,7 @@ class DeliveryImplLoggerTest : TestCase() {
 
     @Before
     override fun setUp() {
-        logger = DeliveryLogger()
+        logger = PizzaLogger()
     }
 
     fun testLog() {
